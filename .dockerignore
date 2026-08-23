@@ -1,0 +1,7 @@
+venv/
+**pycache**/
+\*.pyc
+.git/
+.vscode/
+\*.md
+app/models/disease_prediction_model.pkl

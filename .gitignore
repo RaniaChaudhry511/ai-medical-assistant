@@ -1,0 +1,14 @@
+# Python virtual environments and bytecode
+venv/
+__pycache__/
+*.pyc
+
+# Local environment configuration
+.env
+
+# Generated ML model artifact
+app/models/disease_prediction_model.pkl
+
+# Unused/exported skin-model weight artifacts
+app/models/best_skin_model.weights.h5
+app/models/best_skin_model_weights.h5

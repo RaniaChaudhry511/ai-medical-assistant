@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Medical Assistant</title>
+  <style>
+    :root { --ink:#332a4a; --muted:#766b8a; --primary:#8b5cf6; --primary-dark:#7044dc; --pink:#ec74b4; --card:#ffffff; --line:#ece5f4; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:linear-gradient(135deg,#eee4ff 0%,#f9e1f0 53%,#ffe4e8 100%); }
+    .page { width:min(960px, calc(100% - 32px)); margin:0 auto; padding:28px 0 48px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:28px; }
+    .brand { display:flex; align-items:center; }
+    .brand-mark { display:grid; place-items:center; width:38px; height:38px; color:#fff; background:linear-gradient(135deg,#8b5cf6,#ec74b4); border-radius:13px; box-shadow:0 8px 18px #a865ba45; font-size:1.3rem; }
+    .header-note { color:var(--muted); font-size:.9rem; }
+    .card { overflow:hidden; background:var(--card); border:1px solid #fff; border-radius:26px; box-shadow:0 22px 54px #6e4b7c2e; }
+    .hero { padding:42px 48px 30px; text-align:center; }
+    h1 { margin:0; font-size:clamp(2.25rem,6vw,3.5rem); letter-spacing:-.06em; line-height:1.08; }
+    .tagline { margin:10px auto 0; color:#1a1a1a; font-size:clamp(.86rem,2vw,1rem); line-height:1.5; }
+    .hero-description { max-width:600px; margin:16px auto 0; color:var(--muted); line-height:1.6; }
+    .how-to-use { max-width:640px; margin:22px auto 0; text-align:left; border:1px solid #eadcf3; border-radius:14px; background:#fcf9fe; }
+    .how-to-use summary { display:flex; align-items:center; justify-content:space-between; padding:12px 15px; color:#5e4384; cursor:pointer; font-size:.9rem; font-weight:800; list-style:none; }
+    .how-to-use summary::-webkit-details-marker { display:none; }
+    .how-to-use summary::after { content:"+"; color:var(--primary); font-size:1.15rem; font-weight:500; }
+    .how-to-use[open] summary::after { content:"−"; }
+    .how-to-content { padding:0 16px 15px; color:#665a73; font-size:.88rem; line-height:1.55; }
+    .how-to-content h3 { margin:12px 0 4px; color:var(--ink); font-size:.92rem; }
+    .how-to-content ul { margin:5px 0; padding-left:19px; }
+    .how-to-content li + li { margin-top:4px; }
+    .how-to-disclaimer { margin:13px 0 0; padding-top:11px; border-top:1px solid #eee5f4; color:#7f647e; font-size:.82rem; }
+    .tabs { display:flex; gap:7px; margin:0 32px; padding:6px; background:#f6f1fb; border-radius:15px; }
+    .tab { flex:1; border:0; border-radius:11px; padding:12px 14px; color:var(--muted); cursor:pointer; font:inherit; font-weight:700; background:transparent; transition:.2s; }
+    .tab.active { color:var(--primary-dark); background:#fff; box-shadow:0 3px 10px #76508a21; }
+    .panel { display:none; padding:32px 48px 46px; }
+    .panel.active { display:block; }
+    h2 { margin:0 0 8px; font-size:1.35rem; letter-spacing:-.03em; }
+    .intro { margin:0 0 20px; color:var(--muted); font-size:.94rem; }
+    .chips { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:18px; }
+    .chip { border:1px solid #e9dff4; border-radius:999px; padding:9px 13px; cursor:pointer; color:#5f536e; background:#fbf9fd; font:inherit; font-size:.9rem; transition:.18s; }
+    .chip:hover { border-color:#cdb4f6; }
+    .chip.selected { color:#5d2eb7; border-color:#bca0eb; background:#eee5ff; font-weight:700; }
+    .input-row { display:flex; gap:10px; }
+    input[type=text] { min-width:0; flex:1; padding:13px 15px; outline:0; color:var(--ink); border:1px solid var(--line); border-radius:12px; font:inherit; }
+    input[type=text]:focus { border-color:#b99ae9; box-shadow:0 0 0 4px #9a69ed1c; }
+    .secondary { border:1px solid #dacdea; border-radius:12px; padding:0 15px; color:#694d92; background:#fff; cursor:pointer; font:inherit; font-weight:700; }
+    .drop-zone { display:grid; place-items:center; min-height:214px; padding:28px; text-align:center; border:2px dashed #d8bce9; border-radius:18px; background:linear-gradient(150deg,#fdfaff,#fff8fc); cursor:pointer; transition:.2s; }
+    .drop-zone.dragging { border-color:var(--primary); background:#f4edff; }
+    .upload-icon { font-size:2.3rem; line-height:1; }
+    .drop-zone strong { display:block; margin-top:11px; }
+    .drop-zone span { display:block; margin-top:5px; color:var(--muted); font-size:.9rem; }
+    .preview-wrap { position:relative; display:none; width:fit-content; max-width:100%; margin:16px auto 0; }
+    #preview { display:block; max-height:155px; max-width:100%; border-radius:12px; object-fit:cover; box-shadow:0 7px 18px #64477622; }
+    .remove-image { position:absolute; top:-8px; right:-8px; display:grid; place-items:center; width:25px; height:25px; padding:0; border:2px solid #fff; border-radius:50%; color:#fff; background:#574367; box-shadow:0 3px 9px #33204345; cursor:pointer; font:700 1rem/1 system-ui; }
+    .remove-image:hover { background:#1a1a1a; }
+    .check { width:100%; margin-top:22px; padding:14px 18px; border:0; border-radius:13px; color:#fff; cursor:pointer; background:linear-gradient(105deg,var(--primary),var(--pink)); box-shadow:0 10px 20px #9b50a652; font:inherit; font-weight:800; font-size:1rem; transition:transform .18s, opacity .18s; }
+    .check:hover { transform:translateY(-1px); } .check:disabled { cursor:wait; opacity:.67; transform:none; }
+    .status { min-height:22px; margin:15px 0 0; color:var(--muted); font-size:.9rem; text-align:center; }
+    .status.error { color:#b4235c; } .status.success { color:#4b3d6a; }
+    .results { display:none; margin-top:26px; }
+    .results.visible { display:block; }
+    .results h3 { margin:0 0 12px; font-size:1.06rem; }
+    .result-list { display:grid; gap:10px; }
+    .result { padding:15px; border:1px solid #efe7f5; border-radius:15px; background:#fff; }
+    .result-top { display:flex; justify-content:space-between; gap:16px; align-items:baseline; }
+    .result-name { font-weight:800; } .confidence { color:#715b8d; white-space:nowrap; font-size:.92rem; font-weight:700; }
+    .progress { overflow:hidden; height:8px; margin-top:11px; border-radius:999px; background:#f0eaf5; }
+    .progress > i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#8b5cf6,#ed78b5); }
+    .disclaimer { margin:24px 0 0; color:#8a7e98; text-align:center; font-size:.78rem; line-height:1.5; }
+    @media (max-width:600px) { .page { width:min(100% - 20px,960px); padding-top:16px; } header { margin-bottom:18px; } .header-note { display:none; } .hero { padding:32px 22px 25px; } .tabs { margin:0 16px; } .panel { padding:28px 22px 34px; } .input-row { flex-direction:column; } .secondary { min-height:44px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span></div><div class="header-note">AI-guided screening, made simple</div></header>
+    <section class="card">
+      <div class="hero"><h1>AI Medical Assistant</h1><p class="tagline">Small signs matter — let's decode them together.</p><p class="hero-description">Choose how you would like to check your symptoms. This tool provides screening insights, not a medical diagnosis.</p><details class="how-to-use"><summary>How to use</summary><div class="how-to-content"><h3>For Symptoms tab</h3><ul><li>Click the symptom chips that apply to you, or type your own in the box and click “Add symptom”.</li><li>Add each symptom separately — don't type multiple symptoms as one sentence; add one at a time.</li><li>Click “Check symptoms” when done.</li></ul><h3>For Photo tab</h3><ul><li>Upload a clear photo of the affected skin area (JPG or PNG).</li><li>Click “Check photo” to get results.</li></ul><p class="how-to-disclaimer">This tool provides screening insights only, not a medical diagnosis. Please consult a doctor for proper evaluation.</p></div></details></div>
+      <div class="tabs" role="tablist" aria-label="Screening method">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="symptoms-panel" data-tab="symptoms">Check by Symptoms</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="photo-panel" data-tab="photo">Check by Photo</button>
+      </div>
+      <section id="symptoms-panel" class="panel active" role="tabpanel">
+        <h2>What are you feeling?</h2><p class="intro">Select any symptoms that apply, or add your own below.</p>
+        <div id="chips" class="chips" aria-label="Common symptoms"></div>
+        <div class="input-row"><input id="custom-symptom" type="text" placeholder="Add a symptom, for example: dizziness" aria-label="Custom symptom"><button id="add-symptom" class="secondary" type="button">Add symptom</button></div>
+        <button id="text-check" class="check" type="button">Check symptoms</button>
+        <p id="text-status" class="status" role="status"></p><div id="text-results" class="results"></div>
+      </section>
+      <section id="photo-panel" class="panel" role="tabpanel" hidden>
+        <h2>Upload a skin photo</h2><p class="intro">Use a clear, well-lit photo of the affected area.</p>
+        <input id="image-input" type="file" accept="image/*" hidden>
+        <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Upload an image"><div><div class="upload-icon">⌁</div><strong>Drop an image here or click to browse</strong><span>JPG, PNG, or another image format</span><div id="preview-wrap" class="preview-wrap"><img id="preview" alt="Selected image preview"><button id="remove-image" class="remove-image" type="button" aria-label="Remove selected image">×</button></div></div></div>
+        <button id="image-check" class="check" type="button">Check photo</button>
+        <p id="image-status" class="status" role="status"></p><div id="image-results" class="results"></div>
+      </section>
+    </section>
+    <p class="disclaimer">This screening tool is for informational purposes only and is not a substitute for professional medical advice.</p>
+  </main>
+  <script>
+    const commonSymptoms = ["Fever", "Cough", "Headache", "Fatigue", "Sore throat", "Nausea", "Vomiting", "Diarrhea", "Joint pain", "Skin rash", "Shortness of breath", "Dizziness"];
+    const selectedSymptoms = new Set();
+    const chips = document.querySelector("#chips");
+    const customInput = document.querySelector("#custom-symptom");
+    const imageInput = document.querySelector("#image-input");
+    const dropZone = document.querySelector("#drop-zone");
+    let selectedImage = null;
+    let previewUrl = null;
+
+    function addChip(name, selected = false) {
+      const button = document.createElement("button"); button.type = "button"; button.className = "chip"; button.textContent = name;
+      if (selected) { button.classList.add("selected"); selectedSymptoms.add(name); }
+      button.addEventListener("click", () => { button.classList.toggle("selected"); button.classList.contains("selected") ? selectedSymptoms.add(name) : selectedSymptoms.delete(name); });
+      chips.append(button);
+    }
+    commonSymptoms.forEach(name => addChip(name));
+    function addCustom() { const name = customInput.value.trim(); if (!name) return; if (![...selectedSymptoms].some(item => item.toLowerCase() === name.toLowerCase())) addChip(name, true); customInput.value = ""; }
+    document.querySelector("#add-symptom").addEventListener("click", addCustom);
+    customInput.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addCustom(); } });
+
+    document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => {
+      const photo = tab.dataset.tab === "photo";
+      document.querySelectorAll(".tab").forEach(item => { const active = item === tab; item.classList.toggle("active", active); item.setAttribute("aria-selected", active); });
+      document.querySelector("#symptoms-panel").classList.toggle("active", !photo); document.querySelector("#symptoms-panel").hidden = photo;
+      document.querySelector("#photo-panel").classList.toggle("active", photo); document.querySelector("#photo-panel").hidden = !photo;
+    }));
+
+    function setStatus(id, message = "", type = "") { const node = document.querySelector(id); node.textContent = message; node.className = `status ${type}`; }
+    function renderResults(target, predictions) {
+      const container = document.querySelector(target); container.innerHTML = "";
+      if (!predictions?.length) { container.classList.remove("visible"); return; }
+      const title = document.createElement("h3"); title.textContent = "Top matches"; const list = document.createElement("div"); list.className = "result-list";
+      predictions.slice(0, 3).forEach(item => { const confidence = Math.max(0, Math.min(100, Number(item.confidence) || 0)); const name = item.disease || item.condition || "Unknown result"; const card = document.createElement("article"); card.className = "result"; card.innerHTML = `<div class="result-top"><span class="result-name"></span><span class="confidence">${confidence.toFixed(2)}%</span></div><div class="progress"><i style="width:${confidence}%"></i></div>`; card.querySelector(".result-name").textContent = name; list.append(card); });
+      container.append(title, list); container.classList.add("visible");
+    }
+    function messageFrom(response, fallback) { return response.json().then(body => body.detail || fallback).catch(() => fallback); }
+    async function checkSymptoms() {
+      addCustom(); const symptoms = [...selectedSymptoms]; if (!symptoms.length) { setStatus("#text-status", "Select or add at least one symptom.", "error"); return; }
+      const button = document.querySelector("#text-check"); button.disabled = true; setStatus("#text-status", "Checking your symptoms…"); renderResults("#text-results", []);
+      try { const response = await fetch("/predict/text", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({symptoms}) }); if (!response.ok) throw new Error(await messageFrom(response, "Unable to check symptoms.")); const data = await response.json(); renderResults("#text-results", data.predictions); setStatus("#text-status", "Your screening results are ready.", "success"); } catch (error) { setStatus("#text-status", error.message || "Something went wrong. Please try again.", "error"); } finally { button.disabled = false; }
+    }
+    function chooseImage(file) { if (!file || !file.type.startsWith("image/")) { setStatus("#image-status", "Please select a valid image file.", "error"); return; } selectedImage = file; const preview = document.querySelector("#preview"); if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(file); preview.src = previewUrl; document.querySelector("#preview-wrap").style.display = "block"; setStatus("#image-status", `${file.name} is ready to check.`, "success"); }
+    function clearImage(event) { event.stopPropagation(); selectedImage = null; imageInput.value = ""; if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = null; document.querySelector("#preview").removeAttribute("src"); document.querySelector("#preview-wrap").style.display = "none"; setStatus("#image-status"); renderResults("#image-results", []); }
+    dropZone.addEventListener("click", () => imageInput.click()); dropZone.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") imageInput.click(); }); imageInput.addEventListener("change", () => chooseImage(imageInput.files[0])); document.querySelector("#remove-image").addEventListener("click", clearImage);
+    ["dragenter", "dragover"].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.add("dragging"); })); ["dragleave", "drop"].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.remove("dragging"); })); dropZone.addEventListener("drop", event => chooseImage(event.dataTransfer.files[0]));
+    async function checkImage() {
+      if (!selectedImage) { setStatus("#image-status", "Choose an image before checking.", "error"); return; }
+      const button = document.querySelector("#image-check"); button.disabled = true; setStatus("#image-status", "Checking your photo…"); renderResults("#image-results", []); const form = new FormData(); form.append("file", selectedImage);
+      try { const response = await fetch("/predict/image", {method:"POST", body:form}); if (!response.ok) throw new Error(await messageFrom(response, "Unable to check this photo.")); const data = await response.json(); renderResults("#image-results", data.predictions); setStatus("#image-status", "Your screening results are ready.", "success"); } catch (error) { setStatus("#image-status", error.message || "Something went wrong. Please try again.", "error"); } finally { button.disabled = false; }
+    }
+    document.querySelector("#text-check").addEventListener("click", checkSymptoms); document.querySelector("#image-check").addEventListener("click", checkImage);
+  </script>
+</body>
+</html>
