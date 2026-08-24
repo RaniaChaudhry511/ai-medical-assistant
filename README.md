@@ -1,3 +1,11 @@
+
+
+https://github.com/user-attachments/assets/0cb93d88-0eec-4721-a85a-4e7e40c53cbe
+
+
+
+
+
 # AI Medical Assistant
 
 An AI-powered screening tool that lets a user check their health either by describing symptoms in text or by uploading a photo of a skin condition. It combines two separately trained models — a classical Machine Learning model for symptoms and a Deep Learning model for skin images — served through a single FastAPI backend with a simple web UI.

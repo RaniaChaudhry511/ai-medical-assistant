@@ -12,3 +12,5 @@ app/models/disease_prediction_model.pkl
 # Unused/exported skin-model weight artifacts
 app/models/best_skin_model.weights.h5
 app/models/best_skin_model_weights.h5
+
+AI-Medical-Assistant/app/models/disease_prediction_model.pkl
