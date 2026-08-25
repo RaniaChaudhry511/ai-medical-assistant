@@ -6,6 +6,7 @@ health endpoint usable while model files are being copied into ``app/models``.
 
 from __future__ import annotations
 
+import difflib
 from functools import lru_cache
 from pathlib import Path
 import pickle
@@ -70,6 +71,12 @@ def _match_symptoms(
                  if query in column.casefold() or column.casefold() in query),
                 None,
             )
+        if match is None:
+            close_matches = difflib.get_close_matches(
+                query, normalized.keys(), n=1, cutoff=0.75
+            )
+            if close_matches:
+                match = normalized[close_matches[0]]
 
         if match is None:
             unmatched.append(raw_symptom)
