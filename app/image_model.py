@@ -50,11 +50,16 @@ def predict_skin_conditions(image_bytes: bytes) -> dict[str, list[dict[str, floa
     batch = np.expand_dims(np.asarray(image, dtype=np.float32) / 255.0, axis=0)
     probabilities = np.asarray(model.predict(batch, verbose=0))[0]
     top_indices = np.argsort(probabilities)[::-1][: min(3, len(probabilities))]
+    top_probability_sum = float(probabilities[top_indices].sum())
     return {
         "predictions": [
             {
                 "condition": class_indices.get(str(int(index)), f"Class {int(index)}"),
                 "confidence": round(float(probabilities[index]) * 100, 2),
+                "relative_confidence": round(
+                    (float(probabilities[index]) / top_probability_sum) * 100, 2)
+                    if top_probability_sum
+                    else 0.0,
             }
             for index in top_indices
         ]
