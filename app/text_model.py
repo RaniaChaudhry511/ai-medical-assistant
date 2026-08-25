@@ -99,10 +99,15 @@ def predict_diseases(user_symptoms: list[str]) -> dict[str, list[dict[str, float
     probabilities = np.asarray(model.predict_proba(features))[0]
     classes = np.asarray(model.classes_)
     top_indices = np.argsort(probabilities)[::-1][: min(3, len(probabilities))]
+    top_probability_sum = float(probabilities[top_indices].sum())
     predictions = [
         {
             "disease": _disease_name(classes[index], disease_labels),
             "confidence": round(float(probabilities[index]) * 100, 2),
+            "relative_confidence": round(
+                (float(probabilities[index]) / top_probability_sum) * 100, 2)
+                if top_probability_sum
+                else 0.0,
         }
         for index in top_indices
     ]

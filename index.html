@@ -129,7 +129,7 @@
       const container = document.querySelector(target); container.innerHTML = "";
       if (!predictions?.length) { container.classList.remove("visible"); return; }
       const title = document.createElement("h3"); title.textContent = "Top matches"; const list = document.createElement("div"); list.className = "result-list";
-      predictions.slice(0, 3).forEach(item => { const confidence = Math.max(0, Math.min(100, Number(item.confidence) || 0)); const name = item.disease || item.condition || "Unknown result"; const card = document.createElement("article"); card.className = "result"; card.innerHTML = `<div class="result-top"><span class="result-name"></span><span class="confidence">${confidence.toFixed(2)}%</span></div><div class="progress"><i style="width:${confidence}%"></i></div>`; card.querySelector(".result-name").textContent = name; list.append(card); });
+      predictions.slice(0, 3).forEach(item => { const relativeConfidence = Math.max(0, Math.min(100, Number(item.relative_confidence) || 0)); const name = item.disease || item.condition || "Unknown result"; const card = document.createElement("article"); card.className = "result"; card.innerHTML = `<div class="result-top"><span class="result-name"></span><span class="confidence">${relativeConfidence.toFixed(2)}%</span></div><div class="progress"><i style="width:${relativeConfidence}%"></i></div>`; card.querySelector(".result-name").textContent = name; list.append(card); });
       container.append(title, list); container.classList.add("visible");
     }
     function messageFrom(response, fallback) { return response.json().then(body => body.detail || fallback).catch(() => fallback); }
